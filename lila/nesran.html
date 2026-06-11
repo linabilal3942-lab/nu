@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nesran Nezif | Technical Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ============================================================
+       CSS CUSTOM PROPERTIES — Design Tokens
+    ============================================================ */
+    :root {
+      --bg:          #0a0d14;
+      --bg2:         #0f1422;
+      --surface:     rgba(255,255,255,0.04);
+      --border:      rgba(255,255,255,0.08);
+      --accent:      #00d4aa;       /* teal-mint — pharmacy/tech green */
+      --accent2:     #7c6af7;       /* violet complement */
+      --accent3:     #f0a500;       /* gold — smart/premium */
+      --text:        #e8eaf0;
+      --muted:       #8890a6;
+      --white:       #ffffff;
+      --radius:      16px;
+      --radius-sm:   8px;
+      --shadow:      0 8px 40px rgba(0,0,0,0.5);
+      --glow:        0 0 40px rgba(0,212,170,0.25);
+      --transition:  0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       LOADING SCREEN
+    ============================================================ */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-ring {
+      width: 60px; height: 60px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .loader-text {
+      margin-top: 18px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 5%;
+      height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(10,13,20,0.7);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    #navbar.scrolled {
+      border-color: var(--border);
+      background: rgba(10,13,20,0.92);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links {
+      display: flex; gap: 2rem; align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform var(--transition);
+      border-radius: 2px;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 6px; background: none; border: none;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile Nav */
+    .mobile-nav {
+      display: none; flex-direction: column; gap: 0;
+      position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+      background: rgba(10,13,20,0.97);
+      backdrop-filter: blur(24px);
+      padding: 2rem 5%;
+      z-index: 99;
+      transform: translateX(100%);
+      transition: transform 0.35s ease;
+    }
+    .mobile-nav.open { transform: translateX(0); }
+    .mobile-nav a {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    .mobile-nav a:hover { color: var(--accent); }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 100px 5% 60px;
+    }
+
+    /* Gradient mesh background */
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 60%, rgba(0,212,170,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 30%, rgba(124,106,247,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(240,165,0,0.05) 0%, transparent 70%);
+    }
+
+    /* Particle canvas */
+    #particles { position: absolute; inset: 0; z-index: 0; }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 6rem;
+      max-width: 1100px; width: 100%;
+    }
+
+    /* Profile image ring */
+    .profile-wrap {
+      flex-shrink: 0;
+      position: relative;
+      width: 280px; height: 280px;
+    }
+    .profile-ring {
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent3), var(--accent));
+      animation: rotate 4s linear infinite;
+      z-index: 0;
+    }
+    .profile-ring::after {
+      content: '';
+      position: absolute; inset: 4px;
+      border-radius: 50%;
+      background: var(--bg);
+    }
+    .profile-img-container {
+      position: relative; z-index: 1;
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid var(--bg);
+      box-shadow: var(--glow), var(--shadow);
+    }
+    .profile-img-container img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    /* Placeholder avatar shown when no image */
+    .profile-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, var(--bg2), #1a2035);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -2px;
+    }
+    .pulse-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      animation: pulse-out 2.5s ease-out infinite;
+      pointer-events: none;
+    }
+    .pulse-ring:nth-child(1) { inset: -14px; animation-delay: 0s; }
+    .pulse-ring:nth-child(2) { inset: -28px; animation-delay: 0.8s; }
+    .pulse-ring:nth-child(3) { inset: -42px; animation-delay: 1.6s; }
+    @keyframes pulse-out {
+      0%   { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.2); }
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+
+    /* Hero text */
+    .hero-text { flex: 1; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+    .hero-tag i { font-size: 0.7rem; }
+    .hero-name {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--white) 40%, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-height: 1.1em;
+    }
+    .cursor-blink {
+      display: inline-block;
+      width: 3px; height: 0.85em;
+      background: var(--accent);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 0.9s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .hero-role {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--accent3);
+      margin-bottom: 0.35rem;
+    }
+    .hero-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 2.2rem;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 0 20px rgba(0,212,170,0.3);
+    }
+    .btn-primary:hover {
+      background: #00f0c0;
+      box-shadow: 0 0 30px rgba(0,212,170,0.5);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+      transform: translateY(-2px);
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); z-index: 1;
+    }
+    .scroll-hint-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scroll-drop 1.5s ease-in-out infinite;
+    }
+    @keyframes scroll-drop {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(0.5); opacity: 0.4; }
+    }
+
+    /* ============================================================
+       SECTION SHARED STYLES
+    ============================================================ */
+    section { padding: 100px 5%; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block; width: 24px; height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 0.6rem;
+    }
+    .section-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 540px;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Scroll-reveal base */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Glass card */
+    .glass {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ============================================================
+       ABOUT SECTION
+    ============================================================ */
+    #about { background: var(--bg2); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+    .stat-card {
+      padding: 1.4rem 1.6rem;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .stat-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .about-text p {
+      color: var(--muted);
+      font-size: 0.97rem;
+      margin-bottom: 1.1rem;
+      line-height: 1.8;
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .about-badges {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      margin-top: 1.8rem;
+    }
+    .badge {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--accent);
+    }
+
+    /* About visual side */
+    .about-visual {
+      position: relative;
+    }
+    .about-card-main {
+      padding: 2.4rem;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(0,212,170,0.06), rgba(124,106,247,0.06));
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-card-main::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,212,170,0.12) 0%, transparent 70%);
+    }
+    .about-icon-row {
+      display: flex; gap: 1rem; margin-bottom: 1.8rem;
+    }
+    .about-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      border: 1px solid var(--border);
+    }
+    .about-icon.teal { background: rgba(0,212,170,0.1); color: var(--accent); }
+    .about-icon.violet { background: rgba(124,106,247,0.1); color: var(--accent2); }
+    .about-icon.gold { background: rgba(240,165,0,0.1); color: var(--accent3); }
+    .about-card-main h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .about-card-main p { color: var(--muted); font-size: 0.92rem; line-height: 1.75; }
+    .timeline {
+      margin-top: 2rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .timeline-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .timeline-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent);
+      margin-top: 6px; flex-shrink: 0;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .timeline-item h4 { font-size: 0.9rem; font-weight: 600; }
+    .timeline-item p { font-size: 0.8rem; color: var(--muted); }
+
+    /* ============================================================
+       SKILLS SECTION
+    ============================================================ */
+    #skills { background: var(--bg); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.4rem;
+    }
+    .skill-card {
+      padding: 1.8rem 2rem;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      cursor: default;
+    }
+    .skill-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,212,170,0.1);
+    }
+    .skill-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 1.2rem;
+    }
+    .skill-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .skill-name { font-weight: 600; font-size: 0.95rem; }
+    .skill-level { font-size: 0.78rem; color: var(--muted); }
+    .skill-bar-bg {
+      height: 6px; border-radius: 3px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0;
+      transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ============================================================
+       SERVICES SECTION
+    ============================================================ */
+    #services { background: var(--bg2); }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.4rem;
+    }
+    .service-card {
+      padding: 2.2rem;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--card-accent, rgba(0,212,170,0.06)), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .service-card:hover::before { opacity: 1; }
+    .service-card:hover {
+      border-color: var(--card-color, var(--accent));
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .service-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      opacity: 0.06;
+      position: absolute; top: 1rem; right: 1.4rem;
+      line-height: 1;
+      color: var(--white);
+    }
+    .service-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.4rem;
+    }
+    .service-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 0.7rem;
+    }
+    .service-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.75; }
+    .service-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-size: 0.75rem; font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: var(--tag-bg, rgba(0,212,170,0.1));
+      color: var(--tag-color, var(--accent));
+    }
+
+    /* ============================================================
+       PROJECTS SECTION
+    ============================================================ */
+    #projects { background: var(--bg); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.4rem;
+    }
+    .project-card {
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      border-color: var(--accent2);
+    }
+    .project-thumb {
+      height: 180px;
+      background: linear-gradient(135deg, var(--p-from, #0f1422), var(--p-to, #1a2035));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-thumb::after {
+      content: 'Coming Soon';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.6);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .project-card:hover .project-thumb::after { opacity: 1; }
+    .project-body { padding: 1.6rem; }
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .project-tag {
+      font-size: 0.72rem; font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+      background: rgba(124,106,247,0.12);
+      color: var(--accent2);
+    }
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .project-desc { color: var(--muted); font-size: 0.86rem; line-height: 1.7; }
+    .project-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 1rem;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--accent3);
+    }
+    .project-status i { font-size: 0.65rem; animation: blink 1.2s step-end infinite; }
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    #contact { background: var(--bg2); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 1.2rem; }
+    .contact-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.4rem;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color var(--transition);
+    }
+    .contact-item:hover { border-color: var(--accent); }
+    .ci-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .ci-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+    .ci-value { font-size: 0.92rem; font-weight: 600; }
+    .social-row {
+      display: flex; gap: 0.8rem; margin-top: 0.5rem;
+    }
+    .social-btn {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .social-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); transform: translateY(-3px); }
+
+    /* Form */
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.78rem; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+    .form-group input, .form-group textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      resize: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,212,170,0.1);
+    }
+    .form-group input.error, .form-group textarea.error { border-color: #f55; }
+    .error-msg {
+      font-size: 0.75rem; color: #f77;
+      min-height: 1rem;
+    }
+    .form-group textarea { height: 130px; }
+    .btn-submit {
+      align-self: flex-start;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--bg);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,212,170,0.25);
+    }
+    .form-success {
+      display: none;
+      align-items: center; gap: 10px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--accent);
+      font-size: 0.9rem; font-weight: 600;
+    }
+    .form-success.show { display: flex; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 2.4rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .footer-copy { font-size: 0.82rem; color: var(--muted); }
+    .footer-socials { display: flex; gap: 0.7rem; }
+    .footer-social {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .footer-social:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    #back-top {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      opacity: 0; pointer-events: none;
+      transition: all var(--transition);
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(0,212,170,0.35);
+    }
+    #back-top.show { opacity: 1; pointer-events: all; }
+    #back-top:hover { transform: translateY(-4px); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .mobile-nav { display: flex; }
+      .hero-inner {
+        flex-direction: column-reverse;
+        text-align: center;
+        gap: 3.5rem;
+      }
+      .hero-btns { justify-content: center; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 70px 6%; }
+      .profile-wrap { width: 220px; height: 220px; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       LOADING SCREEN
+  ============================================================ -->
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">LOADING</div>
+  </div>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav id="navbar">
+    <div class="nav-logo">NN</div>
+    <ul class="nav-links">
+      <li><a href="#hero"     class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="ham" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="#hero"     onclick="closeMobile()">Home</a>
+    <a href="#about"    onclick="closeMobile()">About</a>
+    <a href="#skills"   onclick="closeMobile()">Skills</a>
+    <a href="#services" onclick="closeMobile()">Services</a>
+    <a href="#projects" onclick="closeMobile()">Projects</a>
+    <a href="#contact"  onclick="closeMobile()">Contact</a>
+  </nav>
+
+  <!-- ============================================================
+       HERO SECTION
+  ============================================================ -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <canvas id="particles"></canvas>
+
+    <div class="hero-inner">
+      <!-- Profile image -->
+      <div class="profile-wrap reveal">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="profile-ring"></div>
+        <div class="profile-img-container">
+          <!-- Replace src with your actual image path, or remove this img tag to show initials -->
+          <div class="profile-placeholder">NN</div>
+        </div>
+      </div>
+
+      <!-- Hero text -->
+      <div class="hero-text reveal" style="transition-delay:0.15s">
+        <div class="hero-tag"><i class="fas fa-circle"></i> Available for Work</div>
+        <h1 class="hero-name" id="typedName"></h1>
+        <p class="hero-role">Technical Manager at Smart Pharmacy</p>
+        <p class="hero-sub">BSc in Information Technology</p>
+        <div class="hero-btns">
+          <a href="#contact" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Contact Me</a>
+          <a href="#projects" class="btn btn-outline"><i class="fas fa-folder-open"></i> View Projects</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-hint-line"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ABOUT SECTION
+  ============================================================ -->
+  <section id="about">
+    <div class="about-grid">
+      <!-- Left: text -->
+      <div>
+        <div class="section-label reveal">About Me</div>
+        <h2 class="section-title reveal" style="transition-delay:.08s">
+          Where Technology<br>Meets Leadership
+        </h2>
+        <div class="about-text reveal" style="transition-delay:.16s">
+          <p>I'm <strong>Nesran Nezif</strong>, a Technical Manager at Smart Pharmacy with a passion for harnessing technology to solve real-world healthcare challenges. My background in Information Technology equips me with a sharp analytical mindset and the systems-thinking needed to lead cross-functional teams.</p>
+          <p>I thrive at the intersection of <strong>smart systems, pharmacy technology, and people leadership</strong>. I believe that great technical management is less about tools and more about asking the right questions — and then building the right answers.</p>
+          <p>My approach: <strong>listen deeply, design deliberately, execute precisely</strong>. Whether it's architecting an IT infrastructure, supporting end-users, or driving innovation in a fast-paced healthcare environment, I bring both clarity and commitment.</p>
+        </div>
+        <div class="about-badges reveal" style="transition-delay:.24s">
+          <span class="badge">Problem Solver</span>
+          <span class="badge">Team Leader</span>
+          <span class="badge">IT Infrastructure</span>
+          <span class="badge">Healthcare Tech</span>
+          <span class="badge">System Design</span>
+        </div>
+        <div class="about-stats reveal" style="transition-delay:.32s">
+          <div class="stat-card">
+            <div class="stat-number">3+</div>
+            <div class="stat-label">Years Experience</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Projects Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">BSc</div>
+            <div class="stat-label">Information Technology</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Client Satisfaction</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: visual card -->
+      <div class="about-visual reveal" style="transition-delay:.1s">
+        <div class="about-card-main">
+          <div class="about-icon-row">
+            <div class="about-icon teal"><i class="fas fa-network-wired"></i></div>
+            <div class="about-icon violet"><i class="fas fa-code"></i></div>
+            <div class="about-icon gold"><i class="fas fa-star"></i></div>
+          </div>
+          <h3>Core Philosophy</h3>
+          <p>Technology should serve people — not the other way around. I build systems and lead teams with empathy, precision, and a constant hunger for innovation.</p>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div>
+                <h4>Technical Manager — Smart Pharmacy</h4>
+                <p>Leading IT infrastructure, smart systems integration, and team development.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--accent2);box-shadow:0 0 8px var(--accent2)"></div>
+              <div>
+                <h4>BSc Information Technology</h4>
+                <p>Foundations in networking, databases, software development, and systems administration.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--accent3);box-shadow:0 0 8px var(--accent3)"></div>
+              <div>
+                <h4>Healthcare Tech Innovator</h4>
+                <p>Bridging IT solutions with pharmacy operations for measurable impact.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SKILLS SECTION
+  ============================================================ -->
+  <section id="skills">
+    <div class="section-label reveal">Expertise</div>
+    <h2 class="section-title reveal" style="transition-delay:.08s">Technical Skills</h2>
+    <p class="section-desc reveal" style="transition-delay:.16s">A diverse skill set built through hands-on experience in technical management, IT support, and software development.</p>
+
+    <div class="skills-grid">
+
+      <div class="skill-card reveal" style="transition-delay:.05s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fab fa-html5"></i></div>
+          <div><div class="skill-name">HTML</div><div class="skill-level">Advanced</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent)">85%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="85" style="background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.1s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(124,106,247,0.1);color:var(--accent2)"><i class="fab fa-css3-alt"></i></div>
+          <div><div class="skill-name">CSS</div><div class="skill-level">Advanced</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent2)">80%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="80" style="background:linear-gradient(90deg,var(--accent2),#a78bfa)"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.15s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(240,165,0,0.1);color:var(--accent3)"><i class="fab fa-js-square"></i></div>
+          <div><div class="skill-name">JavaScript</div><div class="skill-level">Intermediate</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent3)">70%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="70" style="background:linear-gradient(90deg,var(--accent3),#ffd166)"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.2s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-network-wired"></i></div>
+          <div><div class="skill-name">Networking</div><div class="skill-level">Advanced</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent)">90%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="90" style="background:linear-gradient(90deg,var(--accent),#00f0c0)"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.25s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(124,106,247,0.1);color:var(--accent2)"><i class="fas fa-database"></i></div>
+          <div><div class="skill-name">Database Management</div><div class="skill-level">Intermediate</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent2)">75%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="75" style="background:linear-gradient(90deg,var(--accent2),#818cf8)"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.3s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(240,165,0,0.1);color:var(--accent3)"><i class="fas fa-headset"></i></div>
+          <div><div class="skill-name">Technical Support</div><div class="skill-level">Expert</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent3)">95%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="95" style="background:linear-gradient(90deg,var(--accent3),#f59e0b)"></div></div>
+      </div>
+
+      <div class="skill-card reveal" style="transition-delay:.35s">
+        <div class="skill-header">
+          <div class="skill-icon" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-server"></i></div>
+          <div><div class="skill-name">System Administration</div><div class="skill-level">Advanced</div></div>
+          <span style="margin-left:auto;font-weight:700;font-size:.9rem;color:var(--accent)">88%</span>
+        </div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-w="88" style="background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SERVICES SECTION
+  ============================================================ -->
+  <section id="services">
+    <div class="section-label reveal">What I Do</div>
+    <h2 class="section-title reveal" style="transition-delay:.08s">Services I Offer</h2>
+    <p class="section-desc reveal" style="transition-delay:.16s">Delivering end-to-end technology solutions, from hands-on IT support to strategic technical leadership.</p>
+
+    <div class="services-grid">
+      <div class="service-card reveal" style="--card-color:var(--accent);--card-accent:rgba(0,212,170,0.06);transition-delay:.05s">
+        <div class="service-num">01</div>
+        <div class="service-icon-wrap" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-briefcase"></i></div>
+        <h3 class="service-title">Technical Management</h3>
+        <p class="service-desc">Strategic oversight of IT teams and infrastructure. Planning, coordinating, and optimizing technology operations to drive business goals.</p>
+        <span class="service-tag" style="--tag-bg:rgba(0,212,170,0.1);--tag-color:var(--accent)">Leadership</span>
+      </div>
+
+      <div class="service-card reveal" style="--card-color:var(--accent2);--card-accent:rgba(124,106,247,0.06);transition-delay:.1s">
+        <div class="service-num">02</div>
+        <div class="service-icon-wrap" style="background:rgba(124,106,247,0.1);color:var(--accent2)"><i class="fas fa-tools"></i></div>
+        <h3 class="service-title">IT Support</h3>
+        <p class="service-desc">Responsive and expert technical support for hardware, software, and network issues — keeping systems running and users productive.</p>
+        <span class="service-tag" style="--tag-bg:rgba(124,106,247,0.1);--tag-color:var(--accent2)">Support</span>
+      </div>
+
+      <div class="service-card reveal" style="--card-color:var(--accent3);--card-accent:rgba(240,165,0,0.06);transition-delay:.15s">
+        <div class="service-num">03</div>
+        <div class="service-icon-wrap" style="background:rgba(240,165,0,0.1);color:var(--accent3)"><i class="fas fa-pills"></i></div>
+        <h3 class="service-title">Smart System Solutions</h3>
+        <p class="service-desc">Designing and deploying intelligent pharmacy and healthcare systems that integrate technology to streamline operations and improve outcomes.</p>
+        <span class="service-tag" style="--tag-bg:rgba(240,165,0,0.1);--tag-color:var(--accent3)">Innovation</span>
+      </div>
+
+      <div class="service-card reveal" style="--card-color:var(--accent);--card-accent:rgba(0,212,170,0.06);transition-delay:.2s">
+        <div class="service-num">04</div>
+        <div class="service-icon-wrap" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-code"></i></div>
+        <h3 class="service-title">Web Development</h3>
+        <p class="service-desc">Building clean, responsive, and performant websites and web applications with modern HTML, CSS, and JavaScript — from concept to deployment.</p>
+        <span class="service-tag" style="--tag-bg:rgba(0,212,170,0.1);--tag-color:var(--accent)">Development</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PROJECTS SECTION
+  ============================================================ -->
+  <section id="projects">
+    <div class="section-label reveal">Portfolio</div>
+    <h2 class="section-title reveal" style="transition-delay:.08s">Projects</h2>
+    <p class="section-desc reveal" style="transition-delay:.16s">A growing collection of work spanning IT infrastructure, smart systems, and web development. More projects coming soon.</p>
+
+    <div class="projects-grid">
+      <div class="project-card reveal" style="transition-delay:.05s">
+        <div class="project-thumb" style="--p-from:#0d1a2e;--p-to:#0f2a3a">
+          <i class="fas fa-hospital-alt" style="color:var(--accent);opacity:.5;font-size:3.5rem"></i>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span class="project-tag">Smart Systems</span><span class="project-tag">Healthcare</span></div>
+          <h3 class="project-name">Smart Pharmacy Platform</h3>
+          <p class="project-desc">An integrated system for pharmacy inventory management, prescription tracking, and automated reporting for Smart Pharmacy.</p>
+          <div class="project-status"><i class="fas fa-circle"></i> In Development</div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.1s">
+        <div class="project-thumb" style="--p-from:#160d2e;--p-to:#1a0f3a">
+          <i class="fas fa-network-wired" style="color:var(--accent2);opacity:.5;font-size:3.5rem"></i>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span class="project-tag" style="background:rgba(0,212,170,0.12);color:var(--accent)">Networking</span><span class="project-tag" style="background:rgba(0,212,170,0.12);color:var(--accent)">Admin</span></div>
+          <h3 class="project-name">Enterprise Network Setup</h3>
+          <p class="project-desc">Complete LAN/WAN infrastructure design and deployment for a multi-branch organization, including VLAN segmentation and firewall configuration.</p>
+          <div class="project-status"><i class="fas fa-circle"></i> Planning Phase</div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.15s">
+        <div class="project-thumb" style="--p-from:#1a1200;--p-to:#2a1f00">
+          <i class="fas fa-globe" style="color:var(--accent3);opacity:.5;font-size:3.5rem"></i>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span class="project-tag" style="background:rgba(240,165,0,0.12);color:var(--accent3)">Web Dev</span><span class="project-tag" style="background:rgba(240,165,0,0.12);color:var(--accent3)">UI/UX</span></div>
+          <h3 class="project-name">Portfolio Website</h3>
+          <p class="project-desc">This very portfolio — a single-file, responsive web experience built with pure HTML, CSS, and Vanilla JavaScript. No frameworks, just craft.</p>
+          <div class="project-status"><i class="fas fa-circle"></i> Live</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONTACT SECTION
+  ============================================================ -->
+  <section id="contact">
+    <div class="section-label reveal">Get In Touch</div>
+    <h2 class="section-title reveal" style="transition-delay:.08s">Let's Work Together</h2>
+    <p class="section-desc reveal" style="transition-delay:.16s">Have a project in mind or want to discuss technology solutions? I'd love to hear from you.</p>
+
+    <div class="contact-grid">
+      <!-- Contact info -->
+      <div class="contact-info reveal" style="transition-delay:.05s">
+        <div class="contact-item">
+          <div class="ci-icon" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-phone"></i></div>
+          <div>
+            <div class="ci-label">Phone</div>
+            <div class="ci-value">+251 93 918 7299</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon" style="background:rgba(124,106,247,0.1);color:var(--accent2)"><i class="fas fa-envelope"></i></div>
+          <div>
+            <div class="ci-label">Email</div>
+            <div class="ci-value">nesran@smartpharmacy.com</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon" style="background:rgba(240,165,0,0.1);color:var(--accent3)"><i class="fas fa-map-marker-alt"></i></div>
+          <div>
+            <div class="ci-label">Location</div>
+            <div class="ci-value">Jimma</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon" style="background:rgba(0,212,170,0.1);color:var(--accent)"><i class="fas fa-building"></i></div>
+          <div>
+            <div class="ci-label">Company</div>
+            <div class="ci-value">Smart Pharmacy</div>
+          </div>
+        </div>
+
+        <div class="social-row">
+          <a href="#" class="social-btn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="social-btn" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-btn" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="reveal" style="transition-delay:.12s">
+        <div id="formSuccess" class="form-success">
+          <i class="fas fa-check-circle"></i> Message sent successfully! I'll get back to you soon.
+        </div>
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fname">First Name</label>
+              <input type="text" id="fname" placeholder="Nesran" />
+              <span class="error-msg" id="fnameErr"></span>
+            </div>
+            <div class="form-group">
+              <label for="lname">Last Name</label>
+              <input type="text" id="lname" placeholder="Nezif" />
+              <span class="error-msg" id="lnameErr"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="nesran@example.com" />
+            <span class="error-msg" id="emailErr"></span>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" placeholder="Project Inquiry" />
+            <span class="error-msg" id="subjectErr"></span>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell me about your project or inquiry..."></textarea>
+            <span class="error-msg" id="messageErr"></span>
+          </div>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="footer-logo">Nesran Nezif</div>
+    <p class="footer-copy">© 2026 Nesran Nezif | Smart Pharmacy. All rights reserved.</p>
+    <div class="footer-socials">
+      <a href="#" class="footer-social"><i class="fab fa-linkedin-in"></i></a>
+      <a href="#" class="footer-social"><i class="fab fa-github"></i></a>
+      <a href="#" class="footer-social"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="footer-social"><i class="fab fa-telegram-plane"></i></a>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    /* ---- LOADING SCREEN ---- */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+      }, 900);
+    });
+
+    /* ---- PARTICLE CANVAS ---- */
+    const canvas = document.getElementById('particles');
+    const ctx    = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x  = Math.random() * W;
+        this.y  = Math.random() * H;
+        this.r  = Math.random() * 1.5 + 0.4;
+        this.vx = (Math.random() - 0.5) * 0.35;
+        this.vy = (Math.random() - 0.5) * 0.35;
+        this.a  = Math.random() * 0.45 + 0.1;
+        const cols = ['rgba(0,212,170,', 'rgba(124,106,247,', 'rgba(240,165,0,'];
+        this.col = cols[Math.floor(Math.random() * cols.length)];
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > W) this.vx *= -1;
+        if (this.y < 0 || this.y > H) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = this.col + this.a + ')';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 110; i++) particles.push(new Particle());
+
+    function animParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => { p.update(); p.draw(); });
+      // Draw connections
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0,212,170,${0.06 * (1 - d / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animParticles);
+    }
+    animParticles();
+
+    /* ---- TYPING EFFECT ---- */
+    const fullName = 'Nesran Nezif';
+    const nameEl   = document.getElementById('typedName');
+    let ti = 0;
+    nameEl.innerHTML = '<span class="cursor-blink"></span>';
+
+    function typeChar() {
+      if (ti <= fullName.length) {
+        nameEl.innerHTML = fullName.slice(0, ti) + '<span class="cursor-blink"></span>';
+        ti++;
+        setTimeout(typeChar, ti === 1 ? 700 : 80);
+      }
+    }
+    setTimeout(typeChar, 1200);
+
+    /* ---- NAVBAR SCROLL & ACTIVE ---- */
+    const navbar   = document.getElementById('navbar');
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const backTop  = document.getElementById('back-top');
+
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      navbar.classList.toggle('scrolled', y > 40);
+      backTop.classList.toggle('show', y > 400);
+
+      // Active link highlight
+      let current = '';
+      sections.forEach(sec => {
+        if (y >= sec.offsetTop - 120) current = sec.id;
+      });
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    });
+
+    /* ---- HAMBURGER / MOBILE NAV ---- */
+    const ham       = document.getElementById('ham');
+    const mobileNav = document.getElementById('mobileNav');
+
+    ham.addEventListener('click', () => {
+      ham.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+
+    function closeMobile() {
+      ham.classList.remove('open');
+      mobileNav.classList.remove('open');
+    }
+
+    /* ---- SCROLL REVEAL ---- */
+    const reveals = document.querySelectorAll('.reveal');
+    const revObs  = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          // Animate skill bars when visible
+          const bar = e.target.querySelector('.skill-bar-fill[data-w]');
+          if (bar) {
+            setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 200);
+          }
+        }
+      });
+    }, { threshold: 0.12 });
+
+    reveals.forEach(r => revObs.observe(r));
+
+    // Also trigger skill bars for already-visible cards
+    document.querySelectorAll('.skill-bar-fill[data-w]').forEach(bar => {
+      const obs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          bar.style.width = bar.dataset.w + '%';
+          obs.disconnect();
+        }
+      }, { threshold: 0.3 });
+      obs.observe(bar);
+    });
+
+    /* ---- FORM VALIDATION ---- */
+    const form = document.getElementById('contactForm');
+
+    function setErr(id, msg) {
+      const el = document.getElementById(id);
+      const input = document.getElementById(id.replace('Err',''));
+      el.textContent = msg;
+      if (msg) input.classList.add('error');
+      else input.classList.remove('error');
+    }
+
+    function validateEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let valid = true;
+
+      const fname   = document.getElementById('fname').value.trim();
+      const lname   = document.getElementById('lname').value.trim();
+      const email   = document.getElementById('email').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      setErr('fnameErr',   !fname   ? 'First name is required.'  : '');
+      setErr('lnameErr',   !lname   ? 'Last name is required.'   : '');
+      setErr('emailErr',   !email   ? 'Email is required.' : !validateEmail(email) ? 'Enter a valid email.' : '');
+      setErr('subjectErr', !subject ? 'Subject is required.'     : '');
+      setErr('messageErr', !message ? 'Message is required.'     : message.length < 10 ? 'Please write at least 10 characters.' : '');
+
+      if (!fname || !lname || !email || !validateEmail(email) || !subject || !message || message.length < 10) {
+        valid = false;
+      }
+
+      if (valid) {
+        form.style.display = 'none';
+        document.getElementById('formSuccess').classList.add('show');
+        // Reset after 5s
+        setTimeout(() => {
+          form.reset(); form.style.display = 'flex';
+          document.getElementById('formSuccess').classList.remove('show');
+        }, 5000);
+      }
+    });
+
+    // Clear errors on input
+    ['fname','lname','email','subject','message'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        setErr(id + 'Err', '');
+      });
+    });
+
+    /* ---- SMOOTH SCROLL for anchor links ---- */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
